@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=0.5" />
+  <title>jsgame</title>
+  <link rel="stylesheet" href="style.css" />
+  <link href="http://fonts.google.com"></link>
+  <style>
+body{
+	font-family:josefin sans;
+	text-align: center;
+	
+}
+.hide{
+	display: none;
+}
+.boost{
+	box-shadow: 0 5px 15px blue;
+}
+.car{
+	width: 50px;
+	height: 70px;
+	position: absolute;
+	bottom: 100px;
+	overflow: hidden;
+	z-index: 1;
+	background-image:url(car.png);
+	background-color: red;
+	background-repeat: no-repeat;
+	background-size: 100% 100%;
+}
+.gameArea{
+	   width: 400px;
+	   height: 100vh;
+	   background-color:#2d3436;
+	   position:relative;
+	   margin-top:-22px;
+	   border-left: 5px solid #c8d6e5;
+	   border-right: 5px solid #c8d6e5;
+}
+#score{
+	position: absolute;
+    font-size: 30px;
+	width: 300px;
+	height: 70px;
+	top: 15px;
+	text-align: center;
+	color:#fa2322;
+	line-height: 70px;
+	box-shadow: 0 5px 5px #fccf0f;
+	left: 40px;
+	background-color:#fccf03;
+	border:5px solid #fa2223;
+}
+.startScreen{
+	position: absolute;
+	background-color: #ee5253;
+	left: 50%;
+	right: 50%;
+	transform: translate(-50%,-50%);
+	color:white;
+	z-index: 2;
+	top:300px;
+	border:1px solid #ff6b6b;
+	padding: 15px;
+	margin: auto;
+	width:50%;
+	cursor:pointer;
+	letter-spacing:5;
+	font-size: 20px;
+	word-spacing: 3;
+	line-height: 30px;
+	text-transform: uppercase;
+	box-shadow: 0 10px 10px #777;
+	border:5px dashed #fccf03;
+}
+.lines{
+	z-index: 0;
+}
+.level{
+	width: 100px;
+	height: 50px;
+	position: absolute;
+	top:15px;
+	right: 45px;
+	color: white;
+	box-shadow: 0 5px 5px black;
+	background-color:#ee5253;
+	border:5px solid orange;
+}
+.colorSelector{
+	width: 100px;
+	height: 50px;
+	position: absolute;
+	right: 45px;
+	top: 90px;
+	color: white;
+	box-shadow: 0 5px 5px black;
+	background-color:#ee5253;
+	border:5px solid orange;
+}
+.changeBackground{
+	font-style:josefin sans;
+	width: 150px;
+	height: 50px;
+	position: absolute;
+	right: 20px;
+	top: 165px;
+	color: white;
+	box-shadow: 0 5px 5px black;
+	background-color:#ee5253;
+	border:5px solid orange;
+}
+.settings{
+	width: 30px;
+	height: 30px;
+	right: 40px;
+	top: 15px;
+	position:absolute;
+	background-color: aliceblue;
+	z-index: 1;
+	background-size: 100% 100%;
+	background-repeat: no-repeat;
+	background-image:url(setting.png);
+}
+.options{
+	position: absolute;
+	width: 200px;
+	height: 250px;
+	right: 75px;
+	top:15px;
+	box-shadow: 0 5px 15px black;
+}
+.play{
+	width:200px;
+	height: 150px;
+	background-color:#ee5253;
+	z-index: 2;
+	top:300px;
+	left: 50%;
+	right: 50%;
+	transform: translate(-50%,-50%);
+	position: absolute;
+	text-align: center;
+	cursor:pointer;
+	letter-spacing:5;
+	font-size: 20px;
+	word-spacing: 3;
+	line-height: 30px;
+	text-transform: uppercase;
+	box-shadow: 0 10px 10px #777;
+	border:5px dashed #fccf03;
+}
+.button{
+	width: 30px;
+	height: 30px;
+	right: 40px;
+	top: 15px;
+	position:absolute;
+	z-index: 1;
+	background-size: 100% 100%;
+	background-repeat: no-repeat;
+	box-shadow: 0 5px 15px black;
+}
+.showFuel{
+	width: 300px;
+	height:50px;
+	box-shadow:0 5px 15px black;
+	position:absolute;
+	bottom:40px;
+	left:40px;
+}
+.fuelIcon{
+	width: 30px;
+	height: 30px;
+	position:absolute;
+	left:10px;
+	top: 10px;
+	background-size: 100% 100%;
+	background-repeat:no-repeat;
+	background-image: url(fuel2.png);
+}
+.fuel{
+	width: 240px;
+	height: 25px;
+	position: absolute;
+	top: 12.5px;
+	left: 50px;
+}
+.progress{
+	width: 240px;
+	height: 25px;
+	position: absolute;
+	top: 12.5px;
+	left: 50px;
+	box-shadow: 5px 5px 5px black;
+}
+#gamePad{
+	width: 150px;
+	height: 150px;
+	box-shadow: 0 5px 5px black;
+	position:fixed;
+    right: 40px;
+	bottom: 40px;
+}
+.right,.left{
+	width: 53px;
+	height: 20px;
+	position:absolute;
+	top: 65px;
+	box-shadow: 0 5px 5px black;
+	background-size: 100% 100%;
+	background-repeat: no-repeat;
+}
+.right{
+	right: 10px;
+	background-image: url(arrowr.png);
+}
+.left{
+	left: 10px;	
+	background-image: url(arrowl.png);
+}
+.up,.down{
+	width: 20px;
+	height: 53px;
+	position:absolute;
+	left: 65px;
+	box-shadow: 0 5px 5px black;
+	background-size: 100% 100%;
+	background-repeat: no-repeat;
+}
+.up{
+	top: 10px;
+	background-image: url(arrowu.png);
+}
+.down{
+	bottom: 10px;	
+	background-image: url(arrowb.png);
+}
+
+  </style>
+</head>
+<body>
+
+	<div id="score"></div>
+	<div class="showFuel">
+		<div class="fuelIcon"></div>
+		<div class="progress"></div><div class="fuel" class="w3-red" min="0" max="5000" value="0"></div>
+	</div>
+	<div id="gamePad">
+		<div class="up"></div>
+		<div class="down"></div>
+		<div class="left"></div>
+		<div class="right"></div>
+	</div>
+	<div class="play hide" onclick="playGame()"></div>
+	<div class="settings"></div>
+	<div class="button hide"></div>
+	<div class="options hide">
+	<div class="colorSelector">
+		<lable>Select car color</lable>
+	<select id="setColor">
+		<option value="red">Red</option>
+		<option value="orange">Orange</option>
+		<option value="green">Green</option>
+		<option value="yellow">Yellow</option>
+		<option value="lightgreen">Light green</option>
+		<option value="purple">Purple</option>
+		<option value="lightblue">Light blue</option>
+		<option value="neongreen">Neon green</option>
+		<option value="neonblue">Neon blue</option>
+	</select>	
+	</div>
+	<div class="changeBackground">
+		<label>Select background</label>
+		<select id="setBackground">
+			<option value="city">City</option>
+			<option value="railway">Railway</option>
+			<option value="forest">Forest</option>
+			<option value="icey">Icy winter</option>
+			<option value="factory">Factory</option>
+			<option value="beach">Beach</option>
+            <option value="bridge">Bridge</option>
+		</select>
+	</div>
+	<div class="level">
+		<lable>Select game</lable>
+		<select id="hardness">
+		<option value="Easy">Easy</option>
+		<option value="Medium">Medium</option>
+		<option value="Hard">Hard</option>
+		</select>
+	</div>
+    </div>
+	<div class="startScreen" onclick="start()"><p>Click to start the game<br>
+	Use arrow keys to move<br>
+if you hit another car you lose</p></div>
+	<div class="gameArea"></div>
+	<script>
+const score=document.getElementById("score");
+const 
+startScreen=document.querySelector(".startScreen");
+const 
+gameArea=document.querySelector(".gameArea");
+const
+level=document.querySelector(".level");
+const hardness=document.getElementById("hardness");
+const colorSelector=document.querySelector(".colorSelector");
+const setColor=document.getElementById("setColor");
+const cBack=document.querySelector(".changeBackground");
+const setBack=document.getElementById("setBackground");
+const settings=document.querySelector(".settings");
+const options=document.querySelector(".options");
+const play=document.querySelector(".play");
+const button=document.querySelector(".button");
+const fuel=document.querySelector(".fuel");
+const gamePad=document.getElementById("gamePad");
+const up=document.querySelector(".up");
+const down=document.querySelector(".down");
+const right=document.querySelector(".right");
+const left=document.querySelector(".left");
+let player={
+	speed:5,
+	realSpeed:5,
+	settings:false,
+	boost:[{},{},{}],
+	fuel:[{},{},{},{},{}]
+};
+let keys={
+		  ArrowUp:false,
+		  ArrowDown:false,
+		  ArrowRight:false,
+		  ArrowLeft:false,
+		  Shift:false,
+};
+document.addEventListener("keyup",keyUp);
+document.addEventListener("keydown",keyDown);
+settings.addEventListener("click",showOptions);
+button.addEventListener("click",decider);
+up.addEventListener("mousedown",Up);
+down.addEventListener("mousedown",Down);
+right.addEventListener("mousedown",Right);
+left.addEventListener("mousedown",Left);
+up.addEventListener("mouseup",Up2);
+down.addEventListener("mouseup",Down2);
+right.addEventListener("mouseup",Right2);
+left.addEventListener("mouseup",Left2);
+function Up(){
+	keys.ArrowUp=true;
+	up.style.boxShadow="0 0px 0px black";
+}
+function Down(){
+	keys.ArrowDown=true;
+	down.style.boxShadow="0 0px 0px black";
+}
+function Right(){
+	keys.ArrowRight=true;
+	right.style.boxShadow="0 0px 0px black";
+}
+function Left(){
+	keys.ArrowLeft=true;
+	left.style.boxShadow="0 0px 0px black";
+}
+function Up2(){
+	keys.ArrowUp=false;
+	up.style.boxShadow="0 5px 5px black";
+}
+function Down2(){
+	keys.ArrowDown=false;
+	down.style.boxShadow="0 5px 5px black";
+}
+function Right2(){
+	keys.ArrowRight=false;
+	right.style.boxShadow="0 5px 5px black";
+}
+function Left2(){
+	keys.ArrowLeft=false;
+	left.style.boxShadow="0 5px 5px black";
+}
+function keyDown(e){
+	e.preventDefault();
+	keys[e.key]=true;
+	
+}
+function keyUp(e){
+	e.preventDefault();
+	keys[e.key]=false;
+}
+
+function moveLines(){
+let lines=document.querySelectorAll(".lines");
+lines.forEach(function(item){
+if(item.y<400){
+	item.y+=player.speed;
+	item.style.top=item.y+"px";
+}
+if(item.y>=400){
+	item.y= -300;
+	item.style.top=item.y+"px";
+}
+})
+}
+
+function moveEnemyCars(){
+let enemyCars=document.querySelectorAll(".enemyCar");
+enemyCars.forEach(function(item){
+if(item.y<600){
+  	item.y+=player.speed;
+	item.style.top=item.y+"px";
+}
+if(item.y>=600){
+   item.y= -200;
+   item.style.top=item.y+"px";
+item.style.left=Math.floor(Math.random()*350)+"px";
+item.style.backgroundColor="#"+cha()+cha()+cha();
+} 
+if(isCollide(car,item)){
+	endGame();
+}
+player.boost.forEach(function(value){	
+if(isCollide(item,value)){
+     value.classList.add("hide");
+}
+player.fuel.forEach(function(value){
+if(isCollide(item,value)){
+	value.style.display="none";
+}
+})
+}
+)
+})
+}
+
+function moveBoosterBottles(){
+let boosterBottle=document.querySelectorAll(".boosterBottles");
+boosterBottle.forEach(function(item,index){
+player.boost[index]=item;
+if(item.y<3000){
+  	item.y+=player.speed;
+	item.style.top=item.y+"px";
+}
+if(item.y>=3000){
+   item.y= -3000;
+   item.style.top=item.y+"px";
+item.style.left=Math.floor(Math.random()*300)+"px";
+item.style.display="";
+car.style.boxShadow= "0 0px 0px blue";
+player.realSpeed=player.speed;
+//item.style.backgroundColor="#"+cha()+cha()+cha();
+} 
+if(isCollide(car,item)){
+	getBoost(item);
+}
+})
+}
+
+function moveBackground(){
+	let games=document.querySelectorAll(".games");
+	games.forEach(function(value){
+        if(value.y<625){
+			value.y+=player.speed;
+			value.style.top=value.y+"px";
+		}
+		if(value.y>=625){
+			value.y=-625;
+			value.style.top=value.y+"px"
+		}
+	})
+}
+
+function moveFuels(){
+let fuels=document.querySelectorAll(".fuels");
+fuels.forEach(function(item,index){
+player.fuel[index]=item;
+if(item.y<3000){
+  	item.y+=player.speed;
+	item.style.top=item.y+"px";
+}
+if(item.y>=3000){
+   item.y= -3000;
+   item.style.top=item.y+"px";
+item.style.left=Math.floor(Math.random()*300)+"px";
+item.style.display="";
+} 
+if(isCollide(car,item)){
+	getFuel(item);
+}
+})
+};
+
+function getFuel(item){
+	item.style.display="none";
+	fuel.value=fuel.value+30;
+}
+
+function getBoost(item){
+	  player.realSpeed+=5;
+	  item.style.display="none";
+	  car.style.boxShadow= "0 5px 15px blue";
+}
+
+function endGame(){
+	score.innerHTML="Game Over";
+	player.ready=false;
+	startScreen.classList.remove("hide");
+	settings.classList.remove("hide");
+	button.classList.add("hide")
+	startScreen.innerHTML="<p>"+"Click to restart the game"+"<br>"+"Use arrow keys to move"+"<br>"+"Your score:"+Score+"</p>";
+	if(fuel.value<=0){
+		startScreen.innerHTML="<p>"+"Your fuel is evacuated"+"Click to restart the game"+"<br>"+"Use arrow keys to move"+"<br>"+"Your score:"+Score+"</p>";
+	}
+}
+
+function isCollide(a,b){
+   aInfo=a.getBoundingClientRect();
+   bInfo=b.getBoundingClientRect();
+   return !((aInfo.left>bInfo.right)||(aInfo.right<bInfo.left)||
+        (aInfo.top>bInfo.bottom)||(aInfo.bottom<bInfo.top));
+   
+}
+
+function cha(){
+     let color=("0"+Math.floor((Math.random()*200)).toString(18)).substr(-2);
+	 return color;
+}
+
+function showOptions(){
+	if(!(player.settings)){
+		show();
+	}
+	else if(player.settings){
+		hide();
+	}
+}
+function show(){
+	options.classList.remove("hide");
+	player.settings=true;
+}
+function hide(){
+	options.classList.add("hide");
+	player.settings=false;
+}
+
+function decider(){
+	if(player.ready){
+		pause();
+	}
+	else if(!(player.ready)){
+		playGame();
+	}
+}
+
+function pause(){
+	play.classList.remove("hide");
+	button.style.backgroundImage="url(play.jpg)";
+	play.innerHTML="<p>"+"Click to play the game"+"<br>"+"your current score:"+Score+"</p>";
+	player.ready=false;
+}
+
+function playGame(){
+	button.style.backgroundImage="url(pause3.png)";
+	play.classList.add("hide");
+	player.ready=true;
+	gamePlay();
+}
+
+function gamePlay(){		
+if(player.ready){
+score.innerHTML="Score:"+Score;	
+moveLines();
+moveBoosterBottles();
+moveFuels();
+moveEnemyCars();
+moveBackground();
+if(keys.ArrowUp&& player.y>200){
+	player.y-=player.realSpeed;
+}
+if(keys.ArrowRight&& player.x<350){
+	player.x+=player.realSpeed;
+}
+if(keys.ArrowLeft && player.x>0){
+	player.x-=player.realSpeed;
+}
+if(keys.Shift){
+	pause();
+}
+car.style.top=player.y+"px";
+car.style.left=player.x+"px";
+Score++;
+fuel.value=fuel.value-0.05;
+if(fuel.value>=240){
+	fuel.value=240;
+}
+fuel.style.width=fuel.value+"px";
+if(fuel.value<=0){
+	endGame();
+}
+window.requestAnimationFrame(gamePlay);}
+}
+
+function start(){
+	player.ready=true;
+	Score=0;
+	gameArea.innerHTML="";
+startScreen.classList.add("hide");
+player.realSpeed=player.speed;
+fuel.style.backgroundColor="red";
+fuel.style.width="240px";
+fuel.value=fuel.offsetWidth;
+let hard=hardness.value;
+switch(hard){
+	case "Easy":
+	player.realSpeed=5;
+	player.speed=5;
+	break;
+	case "Medium":
+	player.realSpeed=7;
+	player.speed=7;
+	break;	
+    case "Hard":
+	player.realSpeed=10;
+	player.speed=10;	
+    break;
+    default:
+	player.realSpeed=5;
+	player.speed=5;
+	break;	
+}
+car=document.createElement("div");
+car.setAttribute("class","car");
+gameArea.appendChild(car);
+let color=setColor.value;
+switch(color){
+	case "red":
+	car.style.backgroundColor="red";
+	break;
+	case "green":	
+	car.style.backgroundColor="#00aa00";
+	break;
+	case "neongreen":
+	car.style.backgroundColor="#39ff14";
+	break;
+	case "blue":
+	car.style.backgroundColor="blue";
+	break;
+	case "neonblue":
+	car.style.backgroundColor="#1b03a3";
+	break;
+	case "yellow":	
+	car.style.backgroundColor="yellow";
+	break;
+	case "purple":
+	car.style.backgroundColor="purple"
+	break;
+	case "lightgreen":	
+	car.style.backgroundColor="#55ff55";
+	break;
+	case "orange":
+	car.style.backgroundColor="orange";
+	break;
+	case "lightblue":
+	car.style.backgroundColor="#87ceeb"
+	break;
+    default:
+    car.style.backgroundColor="red";
+	break;
+}
+let back=setBack.value;
+for(i=0;i<2;i++){
+let game=document.createElement("div");
+document.body.appendChild(game);
+game.setAttribute("class","games");
+game.style.backgroundRepeat="no-repeat";
+game.style.backgroundSize="100% 100%";
+game.style.width="100%";
+game.style.height="625px";
+game.style.position="absolute";
+game.y=-i*625;
+game.style.top=-i*625+"px";	
+game.style.zIndex=-1;
+switch(back){
+	case "city":
+	game.style.backgroundImage="url(bg1.png)";
+	break;
+	case "railway":
+	game.style.backgroundImage="url(bg2.png)";
+	break;
+	case "forest":
+	game.style.backgroundImage="url(bg3.png)";
+	break;
+	case "icey":
+	game.style.backgroundImage="url(bg4.png)";
+	break;
+	case "factory":
+	game.style.backgroundImage="url(bg5.png)";
+	break;
+	case "beach":
+	game.style.backgroundImage="url(bg6.png)";
+	break;
+    case "bridge":
+	game.style.backgroundImage="url(bg7.png)";
+	break;
+	default:	
+	game.style.backgroundImage="url(bg1.png)";
+	break;
+}
+}
+options.classList.add("hide");
+settings.classList.add("hide");
+button.classList.remove("hide");
+button.style.backgroundImage="url(pause3.png)"
+player.x=car.offsetLeft;
+player.y=car.offsetTop;
+
+for(let i=0;i<10;i++){
+let line=document.createElement("div");
+line.setAttribute("class","lines");
+gameArea.appendChild(line);
+line.style.width=10+"px";
+line.style.height=50+"px";
+line.y=i*70*-1;
+line.style.position="absolute";
+line.style.top=(i*70*-1)+"px";
+line.style.margin=195+"px";
+line.style.backgroundColor="white";
+};
+
+for(let i=0;i<3;i++){
+let enemyCar=document.createElement("div");
+enemyCar.setAttribute("class","enemyCar");
+gameArea.appendChild(enemyCar);
+enemyCar.style.width=50+"px";
+enemyCar.style.height=70+"px";
+enemyCar.y=i*300*-1;
+enemyCar.style.top=(i*300*-1)+"px";
+enemyCar.style.backgroundColor="#"+cha()+cha()+cha();
+enemyCar.style.position="absolute";
+enemyCar.style.backgroundImage="url(car.png)";
+enemyCar.style.backgroundSize="100% 100%";
+enemyCar.style.backgroundRepeat="no-repeat";
+enemyCar.style.left=Math.floor(Math.random()*350)+"px";
+enemyCar.style.overflow="hidden";
+};
+for(let i=0;i<3;i++){
+let boosterBottle=document.createElement("div");
+boosterBottle.setAttribute("class","boosterBottles");
+gameArea.appendChild(boosterBottle);
+boosterBottle.style.width=50+"px";
+boosterBottle.style.height=70+"px";
+boosterBottle.y=i*10000*-1;
+boosterBottle.style.top=(i*10000*-1)+"px";
+boosterBottle.style.position="relative";
+boosterBottle.style.backgroundImage="url(booster2.png)";
+boosterBottle.style.backgroundRepeat="no-repeat";
+boosterBottle.style.backgroundSize="100% 100%";
+boosterBottle.style.left=Math.floor(Math.random()*300)+"px";
+boosterBottle.style.overflow="hidden";
+};
+for(let i=0;i<5;i++){
+fuels=document.createElement("div");
+fuels.setAttribute("class","fuels");
+gameArea.appendChild(fuels);
+fuels.style.width=50+"px";
+fuels.style.height=70+"px";
+fuels.y=i*10000*-1;
+fuels.style.top=(i*10000*-1)+"px";
+fuels.style.position="absolute";
+fuels.style.backgroundImage="url(fuel.png)";
+fuels.style.backgroundRepeat="no-repeat";
+fuels.style.backgroundSize="100% 100%";
+fuels.style.left=Math.floor(Math.random()*300)+"px";
+fuels.style.overflow="hidden";
+};
+
+
+window.requestAnimationFrame(gamePlay);
+}
+	</script>
+</body>
+</html>

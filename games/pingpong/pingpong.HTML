@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=0.5">
+    <title>Document</title>
+</head>
+<body>
+    <style>
+        body{
+            margin: 0;
+            font-style: fantasy;
+        }
+        #playButton{
+            width: 100px;
+            height:50px;
+            background-color:blue;
+            z-index: 1;
+            position: absolute;
+            left: 720px;
+            top: 330px;
+            font-size: 30px;
+            text-align:center;
+            color: white;
+        }
+        #background{
+            width:100%;
+            height:100vh;
+            background-color: orange;
+            z-index: 0;
+            position:fixed;
+            top:0px;
+            left:0px;
+            display:none;
+        }
+        #score{
+            bottom:15px;
+            left:15px;
+            width:150px;
+            height:100px;
+            color:white;
+            text-align: center;
+            padding: auto;
+            font-size: 30px;
+            position:fixed;
+       }
+       #score2{
+            top:15px;
+            left:15px;
+            width:150px;
+            height:100px;
+            color:white;
+            text-align: center;
+            padding: auto;
+            font-size: 30px;
+            position:fixed;   
+       }
+       #returnScreen{
+           font-size:30px;
+           width:200px;
+           height: 150px;
+           top:250px;
+           text-align: center;
+           color: white;
+           position: fixed;
+           left:50%;
+           right:50%;
+           transform: translate(-50%,-50%);
+       }
+       #screen{
+           width: 100%;
+           margin: 0;
+           height: 100vh;
+           position:fixed;
+           top:0px;
+           left:0px;
+           background-color: orange;
+           z-index: 0;
+       }
+       #heading{
+           position: fixed;
+           top:200px;
+           left:50%;
+           right: 50%;
+           transform: translate(-50%,-50%);
+           border-radius: 25px;
+       }
+       #mode{
+           width: 150px;
+           height: 50px;
+           position:fixed;
+           top:330px;
+           left:540px;
+           background-color: blue;
+           text-align:center;
+           color: white;
+       }
+    </style>
+    <div id="background">
+    </div>
+    <div id="screen">
+    <canvas id="heading" width="700" height="200"></canvas>
+    <div id="mode">
+       <lable style="display:block">Mode</lable>
+    <select id="select">
+        <option value="singleplayer">Singleplayer</option>
+        <option value="multiplayer">Multiplayer</option>
+    </select>
+    </div>
+    <div id="playButton">
+         Play
+    </div>     
+    </div>
+    <script>
+       const pB=document.getElementById("screen");
+       const p=document.getElementById("playButton");
+       const b=document.getElementById("background");
+       const h=document.getElementById("heading");
+       const mode=document.getElementById("select");
+       let ctx=h.getContext("2d");
+       let grd=ctx.createLinearGradient(0,0,700,0);
+       grd.addColorStop(0,"red");
+       grd.addColorStop(0.5,"orange");
+       grd.addColorStop(1,"yellow");
+       ctx.fillStyle=grd;
+       ctx.fillRect(0,0,700,200);
+       ctx.font="150px Arial";
+       ctx.strokeText("PingPong",30,150);
+       let keys={};
+       let player={};
+       let player2={};
+       let ballObject={};
+       let XDirections=["right","left"];
+       let YDirections=["top","bottom"];
+       let speeds=[5,6,7,8,9,10];
+       let particles=[];
+       let particlesCount=20;
+       let particlePos={};
+       let ding=new Audio("ding.wav");
+       let wall=new Audio("wall.mp3");
+       let punch=new Audio("punch.wav");
+       p.addEventListener("click",start);
+       document.addEventListener("keyup",keyUp);
+       document.addEventListener("keydown",keyDown);
+        function keyUp(k){
+           k.preventDefault();
+           keys[k.key]=false;
+       }
+        function keyDown(k){
+           k.preventDefault();
+           keys[k.key]=true;
+           if(k.key=="Shift" && !(player.ready)){
+           start();
+           }   
+       }
+        function start(){
+           player.ready=true;
+           pB.style.display="none";
+           b.style.display="block";
+           b.innerHTML="";
+           let score=document.createElement("div");
+           b.appendChild(score);
+           score.id="score";
+           player.score=0;
+           player2.score=0;
+           score.innerHTML=`Score:${player.score}`;
+           ballObject.directionX=undefined;
+           ballObject.directionY=undefined;
+           ball=document.createElement("div");
+           ball.id="ball";
+           b.appendChild(ball);
+           ball.style.width="20px";
+           ball.style.height="20px";
+           ball.style.backgroundColor="white";
+           ball.style.position="fixed";
+           ball.style.borderRadius="50%";
+           keys.ArrowLeft=false;
+           keys.ArrowRight=false;
+           keys.Control=false;
+           keys.Alt=false;
+           if(mode.value=="singleplayer"){
+           for(let i=0;i<2;i++){
+              if(i<1){
+                 let barrier=document.createElement("div");
+                 b.appendChild(barrier);
+                 barrier.setAttribute("class","barrier");
+                 barrier.style.position="fixed";
+                 barrier.style.width="100%";
+                 barrier.style.height="10px";
+                 barrier.style.left="0px"
+                 barrier.style.top="0px";
+                 barrier.style.backgroundColor="red";
+              }
+              else if(i>0){
+                for(let j=0;j<2;j++){  
+                 let barrier=document.createElement("div");
+                 b.appendChild(barrier);
+                 barrier.setAttribute("class","barrier");
+                 barrier.style.position="fixed";
+                 barrier.style.height="100vh";
+                 barrier.style.width="10px";
+                 barrier.style.backgroundColor="red";
+                 if(j==0){
+                     barrier.style.right="0px";
+                 }
+                 else if(j==1){
+                     barrier.style.left="0px";
+                 }
+                }
+                document.getElementById("score").style.top="15px"; 
+              }
+           }   
+           ball.style.top=Number.parseInt(Math.random()*(b.offsetWidth*1/4))+"px";
+           ball.style.left=Number.parseInt(Math.random()*(b.offsetWidth*9/10))+"px";
+           ballObject.directionX=getDirectionX();
+           ballObject.directionY=getDirectionY();
+           window.requestAnimationFrame(gamePlaySingleMode);
+           }
+
+
+           else if(mode.value=="multiplayer"){
+            for(let j=0;j<2;j++){  
+                 let barrier=document.createElement("div");
+                 b.appendChild(barrier);
+                 barrier.setAttribute("class","barrier");
+                 barrier.style.position="fixed";
+                 barrier.style.height="100vh";
+                 barrier.style.width="10px";
+                 barrier.style.backgroundColor="red";
+                 if(j==0){
+                     barrier.style.right="0px";
+                 }
+                 else if(j==1){
+                     barrier.style.left="0px";
+                 };     
+           }
+           slide2=document.createElement("div");
+           slide2.style.position="fixed";
+           slide2.setAttribute("id","slide2");
+           b.appendChild(slide2);
+           slide2.style.left="45%";
+           slide2.style.top="0px";
+           slide2.style.backgroundColor="red";
+           slide2.style.width="200px";
+           slide2.style.height="10px";
+           player2.left=slide2.offsetLeft;
+           let score2=document.createElement("div");
+           b.appendChild(score2);
+           score2.id="score2";
+           score2.innerHTML=`Score:${player2.score}`;
+           ball.style.top="10px";
+           ball.style.left="690px";
+           ballObject.directionX=getDirectionX();
+           ballObject.directionY="bottom";
+           window.requestAnimationFrame(gamePlayMultyMode);
+           };
+
+
+           slide=document.createElement("div");
+           slide.style.position="fixed";
+           slide.setAttribute("id","slide");
+           b.appendChild(slide);
+           slide.style.left="45%";
+           slide.style.bottom="0px";
+           slide.style.backgroundColor="red";
+           slide.style.width="200px";
+           slide.style.height="10px";
+           player.left=slide.offsetLeft; 
+           ballObject.speedX=getSpeedX();
+           canvas=document.createElement("canvas");
+           b.appendChild(canvas);
+           canvas.width="50";
+           canvas.height="50";
+           canvas.backgroundColor="orange";
+           canvas.style.display="hide";
+           canvas.style.position="absolute";
+           canvas.style.zIndex="0";
+        }
+        function isCollide(a,b){
+           aInfo=a.getBoundingClientRect();
+           bInfo=b.getBoundingClientRect();
+           return !((aInfo.left>bInfo.right)||(aInfo.right<bInfo.left)||
+           (aInfo.top>bInfo.bottom)||(aInfo.bottom<bInfo.top));
+        }
+        function moveBall(directionX,directionY,speedX,speedY){
+           let x=ball.offsetLeft;
+           let y=ball.offsetTop;
+           if(directionX=="right"){x+=speedX; ball.style.left=x+"px"}
+           else if(directionX=="left"){x-=speedX; ball.style.left=x+"px"};
+           if(directionY=="top"){y-=speedY; ball.style.top=y+"px"}
+           else if(directionY=="bottom"){y+=speedY; ball.style.top=y+"px"};
+        }
+        function getDirectionX(){
+           let dir=ballObject.directionX;
+           if(dir=="right"){
+               dir="right";
+           }
+           else if(dir=="left"){
+               dir="left";
+           }
+           else{
+               for(;dir==undefined;){
+                  dir=XDirections[Math.floor(Math.random()*3)];
+               }
+           }
+           return dir;
+        }
+        function getDirectionY(){
+           let dir=ballObject.directionY;
+           if(dir=="bottom"){
+               dir="bottom";
+           }
+           else if(dir=="top"){
+               dir="top";
+           } 
+           else{
+            for(;dir==undefined;){
+            dir=YDirections[Math.floor(Math.random()*3)];
+            };
+           }
+           return dir;
+        }
+        function getSpeedX(){
+           let speed=speeds[Math.floor(Math.random()*6)];
+           for(;speed==undefined;){
+           speed=speeds[Math.floor(Math.random()*6)];
+           }
+            console.log(speed);
+           return speed;
+        }
+        function endGame(){
+            let r=document.createElement("div");
+            b.appendChild(r);
+            r.id="returnScreen";
+            r.innerHTML=`<p> Game over<br>click to return home</p>`;
+            r.addEventListener("click",returnHome);
+            punch.play();
+            player.ready=false;
+        }
+        function returnHome(){
+            b.style.display="none";
+            pB.style.display="block";
+        }
+        function createParticles(x, y, m) {
+	       this.x = x || 0;
+	       this.y = y || 0;
+	
+	       this.radius = 1.2;
+	
+	       this.vx = -1.5 + Math.random()*3;
+	       this.vy = m * Math.random()*1.5;
+        }
+        function gamePlaySingleMode(){
+           let barriers=document.querySelectorAll(".barrier");
+           if(isCollide(ball,barriers[0])){
+               ballObject.directionX=getDirectionX();
+               ballObject.directionY="bottom";
+               ballObject.speedX=getSpeedX();
+               wall.play();
+           }
+           else if(isCollide(ball,barriers[1])){
+               ballObject.directionX="left";
+               ballObject.directionY=getDirectionY();
+               ballObject.speedX=getSpeedX();
+               wall.play();   
+           }
+           else if(isCollide(ball,barriers[2])){
+               ballObject.directionX="right";
+               ballObject.directionY=getDirectionY();
+               ballObject.speedX=getSpeedX();   
+               wall.play();
+           }
+           else if(isCollide(ball,slide)){
+               ballObject.directionX=getDirectionX();
+               ballObject.directionY="top";
+               ballObject.speedX=getSpeedX();
+               player.score++;
+               document.getElementById("score").innerHTML=`Score: ${player.score}`;
+               ding.play();
+               canvas.style.display="block";
+               canvas.style.bottom=10+"px";
+               canvas.style.left=ball.offsetLeft+"px";
+           }
+           else if(ball.offsetTop>b.offsetHeight){
+               endGame();
+           };
+           moveBall(ballObject.directionX,ballObject.directionY,ballObject.speedX,ballObject.speedX);
+           if(keys.ArrowRight==true&&(player.left+200+20)<b.getBoundingClientRect().width){player.left+=10;slide.style.left=player.left+"px"}
+           else if(keys.ArrowLeft==true&&player.left>10){player.left-=10;slide.style.left=player.left+"px"};
+           if(player.ready){window.requestAnimationFrame(gamePlaySingleMode)};
+        }  
+        
+        
+        function gamePlayMultyMode(){
+           let barriers=document.querySelectorAll(".barrier");    
+           if(isCollide(ball,barriers[0])){
+               ballObject.directionX="left";
+               ballObject.directionY=getDirectionY();
+               ballObject.speedX=getSpeedX();
+               wall.play();
+           }
+           else if(isCollide(ball,barriers[1])){
+               ballObject.directionX="right";
+               ballObject.directionY=getDirectionY();
+               ballObject.speedX=getSpeedX();
+               wall.play();
+           }
+           else if(isCollide(ball,slide)){
+               ballObject.directionX=getDirectionX();
+               ballObject.directionY="top";
+               ballObject.speedX=getSpeedX();
+               player.score++;
+               document.getElementById("score").innerHTML=`Score:${player.score}`;
+               ding.play();
+           }
+           else if(ball.offsetTop<-15){
+               let r=document.createElement("div");
+               b.appendChild(r);
+               r.id="returnScreen";
+               r.innerHTML=`<p> Player2 lost the game<br>click to return home</p>`;
+               r.addEventListener("click",returnHome);
+               punch.play();
+               player.ready=false;
+           }
+           else if(ball.offsetTop>b.offsetHeight){
+               let r=document.createElement("div");
+               b.appendChild(r);
+               r.id="returnScreen";
+               r.innerHTML=`<p> Player1 lost the game<br>click to return home</p>`;
+               r.addEventListener("click",returnHome);
+               punch.play();
+               player.ready=false;  
+           }
+           else if(isCollide(ball,slide2)){
+               ballObject.directionX=getDirectionX();
+               ballObject.directionY="bottom";
+               ballObject.speedX=getSpeedX();
+               player2.score++;
+               document.getElementById("score2").innerHTML=`Score:${player2.score}`;
+               ding.play();
+           };
+           moveBall(ballObject.directionX,ballObject.directionY,ballObject.speedX,ballObject.speedX);
+           if(keys.ArrowRight&&(player.left+200+20)<b.getBoundingClientRect().width){player.left+=10;slide.style.left=player.left+"px"}
+           else if(keys.ArrowLeft&&player.left>10){player.left-=10;slide.style.left=player.left+"px"};
+           if(keys.Control&&player2.left>10){player2.left-=10;slide2.style.left=player2.left+"px"}
+           else if(keys.Alt&&player2.left+100+20<b.offsetWidth){player2.left+=10;slide2.style.left=player2.left+"px"};
+           if(player.ready){window.requestAnimationFrame(gamePlayMultyMode)};
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trignometry</title>
+    <style>
+        #main{
+            position: absolute;
+            left:50%;
+            right:50%;
+            top:50%;
+            transform: translate(-50%,-50%);
+        }
+    </style>
+</head>
+<body>
+    <canvas height="600" width="500" id="main">Your browser don't support canvas use another</canvas>
+    <script>
+            let ctx=document.getElementById("main").getContext("2d");
+            let w=ctx.canvas.offsetWidth;
+            let h=ctx.canvas.offsetHeight;
+            let currentAngle=30;
+            let hypo=200;
+            let keys={};
+            let theta=String.fromCharCode(952);
+            ctx.font="15px arial";
+            document.addEventListener("keydown",function(e){
+                keys[e.key]=true;
+            });
+            document.addEventListener("keyup",function(e){
+                keys[e.key]=false;
+            })
+            function draw(){
+                let angle=-currentAngle*Math.PI/180;
+                let ratios={
+                    sin:Math.sin(-angle),
+                    cos:Math.cos(-angle),
+                    tan:Math.tan(-angle),                
+                }
+                ratios.sec=1/ratios.cos;
+                ratios.cosec=1/ratios.sin;
+                ratios.cot=1/ratios.tan;
+                ctx.clearRect(0,0,w,h);
+                ctx.strokeRect(0,0,w,h);
+                ctx.beginPath();
+                ctx.moveTo(0,h/2);
+                ctx.lineTo(w,h/2);
+                ctx.stroke();
+                ctx.moveTo(w/2,h/2-20);
+                ctx.arc(w/2,h/2-20,20,angle,0);
+                ctx.moveTo(w/2,h/2-20);
+                ctx.arc(w/2,h/2-20,hypo,angle,angle);
+                ctx.lineTo(ratios.cos*hypo+w/2,h/2-20);
+                ctx.closePath();
+                ctx.stroke();
+                ctx.strokeRect(ratios.cos*hypo+w/2,h/2-20,-10,-10);
+                ctx.fillText(String.fromCharCode(952),w/2+20,h/2-22);
+                ctx.fillText("A",w/2-5,h/2-5);
+                ctx.fillText("B",ratios.cos*hypo+w/2,h/2-20-(ratios.sin*hypo));
+                ctx.fillText("C",ratios.cos*hypo+w/2-5,h/2-5);
+                if(keys.ArrowUp/*&&currentAngle!=90*/){
+                    if(currentAngle!=360){
+                        currentAngle++;
+                    }
+                }else if(keys.ArrowDown/*&&currentAngle!=0*/){
+                    if(currentAngle!=0){
+                        currentAngle--;
+                    }
+                }
+                ctx.strokeRect(w/4,9*h/16,w/2,3*h/8);
+                ctx.strokeRect(w/4,9*h/16,w/2,h/16);
+                ctx.strokeRect(w/4,10*h/16,w/2,h/16);
+                ctx.strokeRect(w/4,11*h/16,w/2,h/16);
+                ctx.strokeRect(w/4,12*h/16,w/2,h/16);
+                ctx.strokeRect(w/4,13*h/16,w/2,h/16);
+                ctx.strokeRect(w/4,14*h/16,w/2,h/16);
+
+                ctx.fillText(`sin${theta}=${ratios.sin}`,w/4,10*h/16);
+                ctx.fillText(`cos${theta}=${ratios.cos}`,w/4,11*h/16);
+                ctx.fillText(`tan${theta}=${ratios.tan}`,w/4,12*h/16);
+                ctx.fillText(`sec${theta}=${ratios.sec}`,w/4,13*h/16);
+                ctx.fillText(`cosec${theta}=${ratios.cosec}`,w/4,14*h/16);
+                ctx.fillText(`cot${theta}=${ratios.cot}`,w/4,15*h/16);
+                window.requestAnimationFrame(draw);
+            }
+            draw();
+    </script>
+</body>
+</html>
